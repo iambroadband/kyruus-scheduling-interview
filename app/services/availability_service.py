@@ -50,12 +50,22 @@ class AvailabilityService:
     ) -> int:
         doctor_availability = self.list_doctor_availability(doctor_id=doctor_id)
 
-        # TODO:
-        # NOTE: book appointments as hour only (assumption for this take home)
-        # get the doctor's availability
-        # create a new DoctorAppointment and insert it to the database if the time slot is available
-        # else, return an error?
-        pass
+        if (doctor_schedule_id := next((doc_sched.id for doc_sched in doctor_availability if doc_sched.start_time == start_time), None)) is not None:
+            self.db.execute(
+                "INSERT INTO doctor_appointments (doctor_id, location_id, doctor_schedule_id) " "VALUES (?, ?, ?)",
+                [doctor_id, location_id, doctor_schedule_id],
+            )
+
+            id = self.db.last_row_id
+
+            assert id
+
+            return id
+        else:
+            raise SchedulingConflictException(f"Doctor with id {doctor_id} is not available at that time.")
+
+
+
 
     def cancel_doctor_appointment(self, appointment_id: int) -> DoctorAppointment:
         cancelled_appointment = self.db.execute(
