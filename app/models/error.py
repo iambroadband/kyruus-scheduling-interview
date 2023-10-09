@@ -1,3 +1,2 @@
-
 class NotFoundException(Exception):
     pass
