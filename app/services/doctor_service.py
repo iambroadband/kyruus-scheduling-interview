@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import List
+
 from app.database.db import DB
-from app.models import Doctor, Location, DoctorLocation
+from app.models import Doctor, DoctorLocation, DoctorSchedule, Location, DoctorAppointment
 from app.models.error import NotFoundException
 
 
 class DoctorService(ABC):
-
     @abstractmethod
     def list_doctors(self) -> List[Doctor]:
         ...
@@ -28,28 +28,34 @@ class DoctorService(ABC):
 
 
 class InMemoryDoctorService(DoctorService):
-
     def __init__(self) -> None:
         self.doctors: List[Doctor] = []
         self.locations: List[Location] = []
         self.doctor_locations: List[DoctorLocation] = []
+        self.doctor_schedules: List[DoctorSchedule] = []
 
     def seed(self):
-        self.doctors.extend([
-            {'id': 0, 'first_name': 'Jane', 'last_name': 'Wright'},
-            {'id': 1, 'first_name': 'Joseph', 'last_name': 'Lister'}
-        ])
+        self.doctors.extend(
+            [
+                {"id": 0, "first_name": "Jane", "last_name": "Wright"},
+                {"id": 1, "first_name": "Joseph", "last_name": "Lister"},
+            ]
+        )
 
-        self.locations.extend([
-            {'id': 0, 'address': '1 Park St'},
-            {'id': 1, 'address': '2 University Ave'}
-        ])
+        self.locations.extend(
+            [
+                {"id": 0, "address": "1 Park St"},
+                {"id": 1, "address": "2 University Ave"},
+            ]
+        )
 
-        self.doctor_locations.extend([
-            {'id': 0, 'doctor_id': 0, 'location_id': 0},
-            {'id': 1, 'doctor_id': 1, 'location_id': 0},
-            {'id': 2, 'doctor_id': 1, 'location_id': 1}
-        ])
+        self.doctor_locations.extend(
+            [
+                {"id": 0, "doctor_id": 0, "location_id": 0},
+                {"id": 1, "doctor_id": 1, "location_id": 0},
+                {"id": 2, "doctor_id": 1, "location_id": 1},
+            ]
+        )
 
     def list_doctors(self) -> List[Doctor]:
         return self.doctors
@@ -62,9 +68,7 @@ class InMemoryDoctorService(DoctorService):
 
     def add_doctor(self, first_name: str, last_name: str) -> int:
         new_doctor = Doctor(
-            id=len(self.doctors),
-            first_name=first_name,
-            last_name=last_name
+            id=len(self.doctors), first_name=first_name, last_name=last_name
         )
 
         self.doctors.append(new_doctor)
@@ -81,49 +85,37 @@ class InMemoryDoctorService(DoctorService):
             if doctor_loc.id == doctor_id
         ]
 
-        return [
-            loc
-            for loc in self.locations
-            if loc.id in location_ids
-        ]
+        return [loc for loc in self.locations if loc.id in location_ids]
 
 
 class InDatabaseDoctorService(DoctorService):
-
     def __init__(self, db: DB):
         self.db = db
 
     def list_doctors(self) -> List[Doctor]:
         dict_result = self.db.execute(
-            'SELECT id, first_name, last_name '
-            'FROM doctors'
+            "SELECT id, first_name, last_name " "FROM doctors"
         )
 
-        return [
-            Doctor(**res) for res in dict_result
-        ]
+        return [Doctor(**res) for res in dict_result]
 
     def get_doctor(self, id: int) -> Doctor:
         dict_result = self.db.execute(
-            'SELECT id, first_name, last_name '
-            'FROM doctors '
-            'WHERE id = ?',
-            [id]
+            "SELECT id, first_name, last_name " "FROM doctors " "WHERE id = ?", [id]
         )
 
         if not dict_result:
             raise NotFoundException()
 
         if len(dict_result) > 1:
-            raise Exception('Found more than one doctor with that ID')
+            raise Exception("Found more than one doctor with that ID")
 
         return Doctor(**dict_result[0])
 
     def add_doctor(self, first_name: str, last_name: str) -> int:
         self.db.execute(
-            'INSERT INTO doctors (first_name, last_name) '
-            'VALUES (?, ?)',
-            [first_name, last_name]
+            "INSERT INTO doctors (first_name, last_name) " "VALUES (?, ?)",
+            [first_name, last_name],
         )
 
         id = self.db.last_row_id
@@ -134,13 +126,31 @@ class InDatabaseDoctorService(DoctorService):
 
     def list_doctor_locations(self, doctor_id: int) -> List[Location]:
         dict_result = self.db.execute(
-            'SELECT l.id, l.address '
-            'FROM doctor_locations dl '
-            'INNER JOIN locations l ON dl.location_id = l.id '
-            'WHERE dl.doctor_id = ?',
-            [doctor_id]
+            "SELECT l.id, l.address "
+            "FROM doctor_locations dl "
+            "INNER JOIN locations l ON dl.location_id = l.id "
+            "WHERE dl.doctor_id = ?",
+            [doctor_id],
         )
 
-        return [
-            Location(**res) for res in dict_result
-        ]
+        return [Location(**res) for res in dict_result]
+
+    def list_doctor_schedules(self, doctor_id: int) -> List[Location]:
+        dict_result = self.db.execute(
+            "SELECT ds.id, ds.doctor_id, ds.day_of_week, ds.start_time, ds.end_time "
+            "FROM doctor_schedules ds "
+            "WHERE ds.doctor_id = ?",
+            [doctor_id],
+        )
+
+        return [DoctorSchedule(**res) for res in dict_result]
+
+    def list_doctor_appointments(self, doctor_id: int) -> List[Location]:
+        dict_result = self.db.execute(
+            "SELECT da.id, da.doctor_id, da.location_id, da.day_of_week, da.start_time, da.end_time "
+            "FROM doctor_appointments da "
+            "WHERE da.doctor_id = ?",
+            [doctor_id],
+        )
+
+        return [DoctorAppointment(**res) for res in dict_result]
