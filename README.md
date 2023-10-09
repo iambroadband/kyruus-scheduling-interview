@@ -77,8 +77,12 @@ python server.py
 Below are a few questions which expand the scope of the service. Please pick one and describe your approach.
 
 * What are some real-world constraints to booking appointments that would add complexity to this API and how would they impact the design.
+	- Physicians can't instantaneously teleport to different locations. We may want to consider which location they are present at during which days.
+	- Appointments are not always the same duration. Sometimes appointments run late or are scheduled for more or less than an hour. We may have to account for this.
 * How would our design change if this API was opened up to external users?
+	- First we'd need to secure the kind of data we share. Even things like doctor availability could be problematic because we don't want external users to have any metadata bout who is booking appointments with whom and when.
 * What concerns are there with multi-tenant data management and how could we modify the design to increase data security?
+	- We wouldn't want cross-contamination of our data between health systems. To avoid this, we would want to have entirely separate resources for each of our tenants. Most likely this would mean having separate tables for each of the health systems so queries are only run against data related to their providers. It could even mean having entirely separate databases.
 
 #### Suggestions ####
 
@@ -87,6 +91,10 @@ Below are a few questions which expand the scope of the service. Please pick one
 * Stub out areas that are not related to core functionality and describe their expected behavior
 * You may choose any means of persistence (ex: database, third-party service, etc.) or choose to exclude it (e.g. in-memory only). We recognize that integrating with a persistence layer may be time-consuming and by omitting it, more time can be allocated to service development.
 * You may use any third-party libraries you feel are appropriate
+
+#### Assumptions ####
+
+* Appointments will always be 1 hour.
 
 ### Who do I talk to? ###
 * If you have any questions prior to your interview, please reach out to your designated Kyruus recruiting contact and he/she will get back to you as soon as possible.
