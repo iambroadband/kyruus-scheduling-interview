@@ -60,7 +60,9 @@ def create_app() -> FastAPI:
 
     @app.get("/availability/{doctor_id}/book")
     def add_doctor_appointment(doctor_id: int, location_id: int, start_time: time):
-        return availability_service.book_doctor_appointment(doctor_id=doctor_id, location_id=location_id, start_time=start_time)
+        return availability_service.book_doctor_appointment(
+            doctor_id=doctor_id, location_id=location_id, start_time=start_time
+        )
 
     @app.delete("/availability/{appointment_id}/cancel")
     def delete_doctor_appointment(appointment_id: int):
