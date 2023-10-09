@@ -23,7 +23,7 @@ INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) V
 INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (4, 0, 0, '15:00', '16:00');
 INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (5, 0, 0, '16:00', '17:00');
 
--- Joseph's Schedule (available every day from noon to 2pm)
+-- Joseph's Schedule (available every weekday from noon to 2pm)
 INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (6, 1, 0, '12:00', '13:00');
 INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (7, 1, 0, '13:00', '14:00');
 INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (8, 1, 1, '12:00', '13:00');
@@ -36,17 +36,13 @@ INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) V
 INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (15, 1, 4, '13:00', '14:00');
 INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (16, 1, 5, '12:00', '13:00');
 INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (17, 1, 5, '13:00', '14:00');
-INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (18, 1, 6, '12:00', '13:00');
-INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (19, 1, 6, '13:00', '14:00');
-INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (20, 1, 7, '12:00', '13:00');
-INSERT INTO doctor_schedules(id, doctor_id, day_of_week, start_time, end_time) VALUES (21, 1, 7, '13:00', '14:00');
 
 
 -- Jane's Appointments
-INSERT INTO doctor_appointments(id, doctor_id, location_id, day_of_week, start_time, end_time) VALUES (0, 0, 0, 0, '09:00', '10:00');
-INSERT INTO doctor_appointments(id, doctor_id, location_id, day_of_week, start_time, end_time) VALUES (1, 0, 1, 0, '10:00', '11:00');
+INSERT INTO doctor_appointments(id, doctor_id, location_id, doctor_schedule_id) VALUES (0, 0, 0, 0);
+INSERT INTO doctor_appointments(id, doctor_id, location_id, doctor_schedule_id) VALUES (1, 0, 1, 1);
 
 -- Joseph's Appointments
-INSERT INTO doctor_appointments(id, doctor_id, location_id, day_of_week, start_time, end_time) VALUES (2, 1, 0, 0, '12:00', '13:00');
-INSERT INTO doctor_appointments(id, doctor_id, location_id, day_of_week, start_time, end_time) VALUES (3, 1, 1, 1, '13:00', '14:00');
-INSERT INTO doctor_appointments(id, doctor_id, location_id, day_of_week, start_time, end_time) VALUES (4, 1, 1, 2, '12:00', '13:00');
+INSERT INTO doctor_appointments(id, doctor_id, location_id, doctor_schedule_id) VALUES (2, 1, 0, 6);
+INSERT INTO doctor_appointments(id, doctor_id, location_id, doctor_schedule_id) VALUES (3, 1, 1, 9);
+INSERT INTO doctor_appointments(id, doctor_id, location_id, doctor_schedule_id) VALUES (4, 1, 1, 10);

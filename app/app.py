@@ -11,7 +11,7 @@ from app.services.availability_service import AvailabilityService
 from app.services.doctor_service import DoctorService
 from app.settings import Settings
 
-FORCE_INIT_DB = False
+FORCE_INIT_DB = True
 
 
 def create_app() -> FastAPI:
@@ -56,14 +56,12 @@ def create_app() -> FastAPI:
 
     @app.get("/availability/{doctor_id}")
     def get_doctor_availability(doctor_id: int):
-        pass
-        # TODO:
-        # return availability_service.list_doctor_availability(doctor_id=doctor_id)
+        return availability_service.list_doctor_availability(doctor_id=doctor_id)
 
     @app.get("/availability/{doctor_id}/book")
     def add_doctor_appointment(doctor_id: int, location_id: int, start_time: time):
-        pass
         # TODO:
+        pass
         # return availability_service.book_doctor_appointment(doctor_id=doctor_id, location_id=location_id, start_time=start_time)
 
     @app.delete("/availability/{appointment_id}/cancel")

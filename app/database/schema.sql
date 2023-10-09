@@ -39,9 +39,8 @@ CREATE TABLE doctor_appointments (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   doctor_id INTEGER NOT NULL,
   location_id INTEGER NOT NULL,
-  day_of_week INTEGER,
-  start_time TIME,
-  end_time TIME,
+  doctor_schedule_id INTEGER NOT NULL,
   FOREIGN KEY (doctor_id) REFERENCES doctors (id)
   FOREIGN KEY (location_id) REFERENCES locations (id)
+  FOREIGN KEY (doctor_schedule_id) REFERENCES doctor_schedules (id)
 )

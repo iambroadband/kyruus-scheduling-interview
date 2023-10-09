@@ -48,6 +48,4 @@ class DoctorAppointment(BaseModel):
     id: int
     doctor_id: int
     location_id: int
-    day_of_week: int
-    start_time: time
-    end_time: time
+    doctor_schedule_id: int
