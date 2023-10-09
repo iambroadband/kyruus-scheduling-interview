@@ -55,6 +55,10 @@ Expectations/assumptions:
 * A doctor can travel instantaneously between locations
 * No UI/front-end is expected
 
+My own assumptions:
+
+* Appointments will always be 1 hour
+
 ## Prerequisites/Running It
 
 Whatever you choose from this list, the app will come up at `localhost:8000` with some swagger docs.
@@ -91,10 +95,6 @@ Below are a few questions which expand the scope of the service. Please pick one
 * Stub out areas that are not related to core functionality and describe their expected behavior
 * You may choose any means of persistence (ex: database, third-party service, etc.) or choose to exclude it (e.g. in-memory only). We recognize that integrating with a persistence layer may be time-consuming and by omitting it, more time can be allocated to service development.
 * You may use any third-party libraries you feel are appropriate
-
-#### Assumptions ####
-
-* Appointments will always be 1 hour.
 
 ### Who do I talk to? ###
 * If you have any questions prior to your interview, please reach out to your designated Kyruus recruiting contact and he/she will get back to you as soon as possible.
