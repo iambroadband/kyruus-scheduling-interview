@@ -51,8 +51,11 @@ class AvailabilityService:
         # else, return an error?
         pass
 
-    def cancel_doctor_appointment(self, appointment_id: int) -> None:
-        self.db.execute(
-            "DELETE FROM doctor_appointments " "WHERE id=(?)",
+    def cancel_doctor_appointment(self, appointment_id: int) -> DoctorAppointment:
+        cancelled_appointment = self.db.execute(
+            "DELETE FROM doctor_appointments " "WHERE id=(?) RETURNING *;",
             [appointment_id],
         )
+
+        if cancelled_appointment is not None:
+            return cancelled_appointment
