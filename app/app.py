@@ -1,3 +1,4 @@
+from datetime import time
 from typing import Optional
 
 from fastapi import FastAPI, Request, Response
@@ -6,22 +7,20 @@ from fastapi.responses import RedirectResponse
 from app.database.db import DB
 from app.models import AddDoctorRequest
 from app.models.error import NotFoundException
-from app.services.doctor_service import (DoctorService,
-                                         InDatabaseDoctorService,
-                                         InMemoryDoctorService)
+from app.services.availability_service import AvailabilityService
+from app.services.doctor_service import DoctorService
 from app.settings import Settings
 
 
 def create_app() -> FastAPI:
     doctor_service: DoctorService
+    availability_service: AvailabilityService
     db: Optional[DB] = None
     if Settings.in_database:
         db = DB()
         db.init_if_needed(force=True)  # NOTE: can force db re-init
-        doctor_service = InDatabaseDoctorService(db=db)
-    else:
-        doctor_service = InMemoryDoctorService()
-        doctor_service.seed()
+        doctor_service = DoctorService(db=db)
+        availability_service = AvailabilityService(db=db)
 
     app = FastAPI(swagger_ui_parameters={"tryItOutEnabled": True})
 
@@ -49,9 +48,21 @@ def create_app() -> FastAPI:
     def get_doctor_schedules(doctor_id: int):
         return doctor_service.list_doctor_schedules(doctor_id=doctor_id)
 
-    @app.get("/doctors/{doctor_id}/appointments")
+    @app.get("/availability/{doctor_id}/appointments")
     def get_doctor_appointments(doctor_id: int):
-        return doctor_service.list_doctor_appointments(doctor_id=doctor_id)
+        return availability_service.list_doctor_appointments(doctor_id=doctor_id)
+
+    @app.get("/availability/{doctor_id}/availability")
+    def get_doctor_availability(doctor_id: int):
+        pass
+        # TODO:
+        # return availability_service.list_doctor_availability(doctor_id=doctor_id)
+
+    @app.get("/availability/{doctor_id}/book")
+    def add_doctor_appointment(doctor_id: int, location_id: int, start_time: time):
+        pass
+        # TODO:
+        # return availability_service.book_doctor_appointment(doctor_id=doctor_id, location_id=location_id, start_time=start_time)
 
     @app.exception_handler(NotFoundException)
     async def not_found(request: Request, exc: NotFoundException):

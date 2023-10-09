@@ -1,94 +1,12 @@
-from abc import ABC, abstractmethod
 from typing import List
 
 from app.database.db import DB
-from app.models import Doctor, DoctorLocation, DoctorSchedule, Location, DoctorAppointment
+from app.models import (Doctor, DoctorAppointment, DoctorLocation,
+                        DoctorSchedule, Location)
 from app.models.error import NotFoundException
 
 
-class DoctorService(ABC):
-    @abstractmethod
-    def list_doctors(self) -> List[Doctor]:
-        ...
-
-    @abstractmethod
-    def get_doctor(self, id: int) -> Doctor:
-        ...
-
-    @abstractmethod
-    def add_doctor(self, first_name: str, last_name: str) -> int:
-        """
-        Returns the id of the new doctor
-        """
-        ...
-
-    @abstractmethod
-    def list_doctor_locations(self, doctor_id: int) -> List[Location]:
-        ...
-
-
-class InMemoryDoctorService(DoctorService):
-    def __init__(self) -> None:
-        self.doctors: List[Doctor] = []
-        self.locations: List[Location] = []
-        self.doctor_locations: List[DoctorLocation] = []
-        self.doctor_schedules: List[DoctorSchedule] = []
-
-    def seed(self):
-        self.doctors.extend(
-            [
-                {"id": 0, "first_name": "Jane", "last_name": "Wright"},
-                {"id": 1, "first_name": "Joseph", "last_name": "Lister"},
-            ]
-        )
-
-        self.locations.extend(
-            [
-                {"id": 0, "address": "1 Park St"},
-                {"id": 1, "address": "2 University Ave"},
-            ]
-        )
-
-        self.doctor_locations.extend(
-            [
-                {"id": 0, "doctor_id": 0, "location_id": 0},
-                {"id": 1, "doctor_id": 1, "location_id": 0},
-                {"id": 2, "doctor_id": 1, "location_id": 1},
-            ]
-        )
-
-    def list_doctors(self) -> List[Doctor]:
-        return self.doctors
-
-    def get_doctor(self, id: int) -> Doctor:
-        if id < 0 or id >= len(self.doctors):
-            raise NotFoundException()
-
-        return self.doctors[id]
-
-    def add_doctor(self, first_name: str, last_name: str) -> int:
-        new_doctor = Doctor(
-            id=len(self.doctors), first_name=first_name, last_name=last_name
-        )
-
-        self.doctors.append(new_doctor)
-
-        return new_doctor.id
-
-    def list_doctor_locations(self, doctor_id: int) -> List[Location]:
-        if doctor_id < 0 or doctor_id >= len(self.doctors):
-            raise NotFoundException()
-
-        location_ids = [
-            doctor_loc.id
-            for doctor_loc in self.doctor_locations
-            if doctor_loc.id == doctor_id
-        ]
-
-        return [loc for loc in self.locations if loc.id in location_ids]
-
-
-class InDatabaseDoctorService(DoctorService):
+class DoctorService:
     def __init__(self, db: DB):
         self.db = db
 
@@ -135,7 +53,7 @@ class InDatabaseDoctorService(DoctorService):
 
         return [Location(**res) for res in dict_result]
 
-    def list_doctor_schedules(self, doctor_id: int) -> List[Location]:
+    def list_doctor_schedules(self, doctor_id: int) -> List[DoctorSchedule]:
         dict_result = self.db.execute(
             "SELECT ds.id, ds.doctor_id, ds.day_of_week, ds.start_time, ds.end_time "
             "FROM doctor_schedules ds "
@@ -144,13 +62,3 @@ class InDatabaseDoctorService(DoctorService):
         )
 
         return [DoctorSchedule(**res) for res in dict_result]
-
-    def list_doctor_appointments(self, doctor_id: int) -> List[Location]:
-        dict_result = self.db.execute(
-            "SELECT da.id, da.doctor_id, da.location_id, da.day_of_week, da.start_time, da.end_time "
-            "FROM doctor_appointments da "
-            "WHERE da.doctor_id = ?",
-            [doctor_id],
-        )
-
-        return [DoctorAppointment(**res) for res in dict_result]
