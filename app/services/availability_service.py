@@ -43,7 +43,7 @@ class AvailabilityService:
 
     def book_doctor_appointment(
         self, doctor_id: int, location_id: int, start_time: time
-    ):
+    ) -> int:
         # TODO:
         # NOTE: book appointments as hour only (assumption for this take home)
         # get the doctor's availability
@@ -51,7 +51,8 @@ class AvailabilityService:
         # else, return an error?
         pass
 
-    def cancel_doctor_appointment(self, appointment_id: int):
-        # TODO:
-        # delete the doctor appointment with the given id
-        pass
+    def cancel_doctor_appointment(self, appointment_id: int) -> None:
+        self.db.execute(
+            "DELETE FROM doctor_appointments " "WHERE id=(?)",
+            [appointment_id],
+        )

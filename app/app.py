@@ -11,6 +11,8 @@ from app.services.availability_service import AvailabilityService
 from app.services.doctor_service import DoctorService
 from app.settings import Settings
 
+FORCE_INIT_DB = False
+
 
 def create_app() -> FastAPI:
     doctor_service: DoctorService
@@ -18,7 +20,7 @@ def create_app() -> FastAPI:
     db: Optional[DB] = None
     if Settings.in_database:
         db = DB()
-        db.init_if_needed(force=True)  # NOTE: can force db re-init
+        db.init_if_needed(force=FORCE_INIT_DB)
         doctor_service = DoctorService(db=db)
         availability_service = AvailabilityService(db=db)
 
@@ -52,7 +54,7 @@ def create_app() -> FastAPI:
     def get_doctor_appointments(doctor_id: int):
         return availability_service.list_doctor_appointments(doctor_id=doctor_id)
 
-    @app.get("/availability/{doctor_id}/availability")
+    @app.get("/availability/{doctor_id}")
     def get_doctor_availability(doctor_id: int):
         pass
         # TODO:
@@ -63,6 +65,12 @@ def create_app() -> FastAPI:
         pass
         # TODO:
         # return availability_service.book_doctor_appointment(doctor_id=doctor_id, location_id=location_id, start_time=start_time)
+
+    @app.delete("/availability/{appointment_id}/cancel")
+    def delete_doctor_appointment(appointment_id: int):
+        return availability_service.cancel_doctor_appointment(
+            appointment_id=appointment_id
+        )
 
     @app.exception_handler(NotFoundException)
     async def not_found(request: Request, exc: NotFoundException):
